@@ -1,8 +1,14 @@
 
-docker-compose up --build
+Build Docker container
+```docker-compose up --build```
 
-with Pry enabled
-docker-compose run --service-ports web
+Run with Pry enabled
+```docker-compose run --service-ports web```
 
-docker-compose run web bundle exec rspec
+Run the tests
+```docker-compose run web bundle exec rspec```
+
+```curl http://localhost:3333/info\?url\=https://i.imgur.com/fIokC3D.jpg```
+
+```curl http://localhost:3333/thumbnail\?url\=https://i.imgur.com/fIokC3D.jpg```
 

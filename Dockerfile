@@ -10,5 +10,3 @@ RUN bundle install
 ADD . /usr/src/app/
 
 EXPOSE 3333
-
-#CMD ["ruby", "/usr/src/app/app.rb"]

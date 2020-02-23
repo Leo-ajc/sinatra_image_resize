@@ -3,7 +3,7 @@ require 'webmock/rspec'
 
 require_relative '../app'
 
-RSpec.describe 'App', type: :request do
+RSpec.describe '/', type: :request do
 
   def app
     Sinatra::Application
@@ -43,11 +43,5 @@ RSpec.describe 'App', type: :request do
     response_image = MiniMagick::Image.read(last_response.body)
 
     expect(response_image.width).to eq dummy_image.width * 0.25
-  end
-
-  it 'says hello world' do
-    get '/'
-    expect(last_response.body).to match(/Hello World/)
-    expect(last_response).to be_ok
   end
 end
