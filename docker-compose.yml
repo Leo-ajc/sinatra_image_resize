@@ -1,0 +1,12 @@
+version: '3'
+services:
+  web:
+    tty: true
+    env_file: .env
+    stdin_open: true
+    build: .
+    command: bundle exec ruby app.rb
+    volumes:
+      - .:/sinatra_image_resize
+    ports:
+      - "3333:3333"
