@@ -1,0 +1,1 @@
+Testing raising MiniMagick::Invalid when trying to open a text file instead of a image file. 

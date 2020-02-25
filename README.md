@@ -22,7 +22,6 @@ Two endpoints:
 
 ### TODO
 
-* Validation of params and return status 400
 * Docker container doesn't live reload in development with code update. Needs to be rebuilt each time.
 
 ### Code
@@ -45,6 +44,9 @@ get '/thumbnail' do
     disposition: 'inline'
   )
 end
+
+# Exception handling code ...
+
 ```
 
 #### Request specs
@@ -69,9 +71,132 @@ end
 
     expect(response_image.width).to eq dummy_image.width * 0.25
   end
+	
+  it 'displays image meta data' do
+    get '/info', url: dummy_image_url_stubbed
+    # The http request is stubbed with the identical
+    # dummy image. Testing the content-type is the
+    # only meaningful test of behaviour here.
+    expect(last_response.content_type).to eq("application/json")
+  end
+
+  it 'resizes dummy image to 25%' do
+    resize_factor = 0.25
+    get '/thumbnail', url: dummy_image_url_stubbed
+
+    expect(last_response.content_type).to eq("image/jpeg")
+
+    dummy_image = MiniMagick::Image.open(dummy_image_path)
+    response_image = MiniMagick::Image.read(last_response.body)
+    expect(response_image.width).to eq dummy_image.width * resize_factor
+  end
+
+	# Exception Handling
+  it 'handles open(params["url"]) not found' do
+    get '/thumbnail', url: 'http://url-not-found-stubbed.com/foo.jpg'
+    expect(last_response.status).to eq 400
+  end
+
+  it 'handles invalid images' do
+    get '/thumbnail', url: 'http://invalid-image-url-stubbed.com/foo.txt'
+    #get '/thumbnail', url: dummy_image_url_stubbed
+    expect(last_response.status).to eq 400
+  end
+
+  ### The Request specs below implicitly test the underlying
+  ### behaviour of ParameterValidation.
+  it 'handles invalid urls' do
+    get '/thumbnail', url: 'htttttttttp://invalid-url.com'
+    expect(last_response.status).to eq 400
+  end
+
+  it 'handles blank urls' do
+    get '/thumbnail', url: '' # blank
+    expect(last_response.status).to eq 400
+  end
+
+  it 'handles absent url params' do
+    get '/thumbnail' # no params
+    expect(last_response.status).to eq 400
+  end	
+```
+
+### Exception handling
+
+```ruby
+error MiniMagick::Invalid do
+  status 400
+  body "400 Bad Request. Invalid image: '#{env['sinatra.error'].message}'"
+end
+```
+
+```
+$ curl http://localhost:3333/info\?url\=http://www.gutenberg.org/cache/epub/61481/pg61481.txt
+400 Bad Request. Invalid image: '`identify /tmp/mini_magick20200225-1-68vpvn.txt` failed with error:
+identify-im6.q16: improper image header `/tmp/mini_magick20200225-1-68vpvn.txt' @ error/txt.c/ReadTXTImage/450.`'
+```
+
+---
+
+```ruby
+error OpenURI::HTTPError do
+  # OpenURI::HTTPError is from MiniMagick::Image.open.
+  # MiniMagick requires OpenURI.
+
+  # When a valid params['url'] leads to a 404 response.
+  # The params['url'] was bad. This is a bad request
+  # from the client => 400 error.
+  status 400
+  body "400 Bad Request. Requested resource '#{params['url']}' is unavailable."
+end
+```
+
+```
+$ curl http://localhost:3333/info\?url\=https://i.imgur.com/responds_with_404.jpg
+400 Bad Request. Requested resource 'https://i.imgur.com/responds_with_404.jpg' is unavailable.
+```
+
+---
+
+```ruby
+error ParameterValidation::Error do
+  # Badly formed URL passed as a param.
+  status 400
+  body '400 Bad Request. Absent or malformed parameters.'
+end
+```
+
+```
+$ curl http://localhost:3333/info\?url\=htttttttttttps://i.imgur.com/fIokC3D.jpg
+400 Bad Request. Absent or malformed parameters.
+```
+
+```
+$ curl http://localhost:3333/info\?url\=
+400 Bad Request. Absent or malformed parameters.
+```
+
+```
+$ curl http://localhost:3333/info\?
+400 Bad Request. Absent or malformed parameters.
+```
+
+```
+$ curl http://localhost:3333/info
+400 Bad Request. Absent or malformed parameters.
+```
+
+```
+$ curl http://localhost:3333/info\?url\=https://i.imgur.com/$$$$fIokC3D.jpg
+400 Bad Request. Absent or malformed parameters.
 ```
 
 ### Install
+
+#### Force into Production environment
+```cp env.production.sample .env```
+
+Note: Without a `.env` file, Sinatra defaults to Development environment.
 
 #### Build Docker container
 ```docker-compose up --build```
