@@ -124,6 +124,7 @@ end
 ### Exception handling
 
 ```ruby
+# app.rb
 error MiniMagick::Invalid do
   status 400
   body "400 Bad Request. Invalid image: '#{env['sinatra.error'].message}'"
@@ -139,6 +140,7 @@ identify-im6.q16: improper image header `/tmp/mini_magick20200225-1-68vpvn.txt' 
 ---
 
 ```ruby
+# app.rb
 error OpenURI::HTTPError do
   # OpenURI::HTTPError is from MiniMagick::Image.open.
   # MiniMagick requires OpenURI.
@@ -159,6 +161,40 @@ $ curl http://localhost:3333/info\?url\=https://i.imgur.com/responds_with_404.jp
 ---
 
 ```ruby
+# ./lib/parameter_validation.rb
+
+module ParameterValidation
+
+  def self.valid_url!(url)
+    blank!(url)
+    valid_uri!(url)
+  end
+
+  class Error < StandardError
+    def initialize(msg="URL is invalid.", exception_type="custom")
+      @exception_type = exception_type
+      super(msg)
+    end
+  end
+
+  def self.valid_uri!(url)
+    uri = URI.parse(url)
+    if !uri.is_a?(URI::HTTP) || uri.host.nil?
+      raise Error.new 'URL is malformed.'
+    end
+  end
+
+  def self.blank!(str)
+    if str.nil? || str.empty?
+      raise Error.new 'Requires URL parameter.'
+    end
+  end
+end
+
+```
+
+```ruby
+# app.rb
 error ParameterValidation::Error do
   # Badly formed URL passed as a param.
   status 400
