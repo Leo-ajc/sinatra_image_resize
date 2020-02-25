@@ -1,6 +1,7 @@
 Bundler.require(:default)                   # load all the default gems
 Bundler.require(Sinatra::Base.environment)  # load all the environment specific gems
 
+set :environment, :production
 set :show_exceptions, false # Required to handle MiniMagick::Invalid in production mode.
 set :port, 3333
 set :bind, '0.0.0.0'
