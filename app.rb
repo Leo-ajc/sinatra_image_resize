@@ -7,17 +7,15 @@ set :port, 3333
 set :bind, '0.0.0.0'
 
 require './lib/parameter_validation'
-before do
-  # Every endpoint requires the param 'url'
-  ParameterValidation.valid_url!(params['url'])
-end
 
 get '/info' do
+  ParameterValidation.valid_url!(params['url'])
   content_type :json
   MiniMagick::Image.open(params['url']).data.to_json
 end
 
 get '/thumbnail' do
+  ParameterValidation.valid_url!(params['url'])
   image = MiniMagick::Image.open params['url']
   image.resize "25%"
   send_file open(image.path,

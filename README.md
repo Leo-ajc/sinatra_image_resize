@@ -32,11 +32,13 @@ Two endpoints:
 # app.rb
 
 get '/info' do
+  ParameterValidation.valid_url!(params['url'])
   content_type :json
   MiniMagick::Image.open(params['url']).data.to_json
 end
 
 get '/thumbnail' do
+  ParameterValidation.valid_url!(params['url'])
   image = MiniMagick::Image.open params['url']
   image.resize "25%"
   send_file open(image.path,
