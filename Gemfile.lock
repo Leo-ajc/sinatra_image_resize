@@ -1,22 +1,64 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    mustermann (1.0.3)
-    rack (2.0.6)
-    rack-protection (2.0.5)
+    addressable (2.8.0)
+      public_suffix (>= 2.0.2, < 5.0)
+    coderay (1.1.3)
+    crack (0.4.5)
+      rexml
+    diff-lcs (1.5.0)
+    dotenv (2.7.6)
+    hashdiff (1.0.1)
+    method_source (1.0.0)
+    mini_magick (4.11.0)
+    mustermann (1.1.1)
+      ruby2_keywords (~> 0.0.1)
+    pry (0.14.1)
+      coderay (~> 1.1)
+      method_source (~> 1.0)
+    public_suffix (4.0.7)
+    rack (2.2.3)
+    rack-protection (2.2.0)
       rack
-    sinatra (2.0.5)
+    rack-test (1.1.0)
+      rack (>= 1.0, < 3)
+    rexml (3.2.5)
+    rspec (3.11.0)
+      rspec-core (~> 3.11.0)
+      rspec-expectations (~> 3.11.0)
+      rspec-mocks (~> 3.11.0)
+    rspec-core (3.11.0)
+      rspec-support (~> 3.11.0)
+    rspec-expectations (3.11.0)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.11.0)
+    rspec-mocks (3.11.1)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.11.0)
+    rspec-support (3.11.0)
+    ruby2_keywords (0.0.5)
+    sinatra (2.2.0)
       mustermann (~> 1.0)
-      rack (~> 2.0)
-      rack-protection (= 2.0.5)
+      rack (~> 2.2)
+      rack-protection (= 2.2.0)
       tilt (~> 2.0)
-    tilt (2.0.9)
+    tilt (2.0.10)
+    webmock (3.14.0)
+      addressable (>= 2.8.0)
+      crack (>= 0.3.2)
+      hashdiff (>= 0.4.0, < 2.0.0)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
+  dotenv
+  mini_magick
+  pry
+  rack-test
+  rspec
   sinatra
+  webmock
 
 BUNDLED WITH
    1.17.1
